@@ -1,0 +1,52 @@
+name: Build and Release PDF
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          args: -pdf -interaction=nonstopmode -shell-escape
+          # Using latexmk internally via xu-cheng action
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeepLearningHandbook-PDF
+          path: main.pdf
+
+      - name: Release Latest PDF
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Build (Rosetta Edition)"
+          body: |
+            This is an automated build of the **Deep Learning Mathematics Atlas**.
+            
+            **Changes in this version:**
+            - Automatically compiled via GitHub Actions.
+            - Full "Rosetta Stone" (Math <-> Code) mapping.
+            - 21 Chapters, 58+ Pages.
+          files: main.pdf
+          prerelease: false
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
