@@ -1,10 +1,10 @@
 \ProvidesPackage{atlas_style}[2026/02/20 Rosetta Stone Style for Deep Learning Math]
 
-% --- 核心字体与编码 (pdflatex 兼容) ---
-\RequirePackage[T1]{fontenc}
+% --- 核心字体与编码 (XeLaTeX 兼容) ---
 \RequirePackage{amsmath, amsfonts, amssymb}
-\RequirePackage{newtxtext}   % Times New Roman for text
-\RequirePackage{newtxmath}   % Times New Roman for math
+\RequirePackage{newtxmath}   % 提供 Times 风格的数学符号
+\RequirePackage{fontspec}    % XeLaTeX 字体引擎
+\setmainfont{TeX Gyre Termes} % 高质量 Times 克隆字体，CI 环境兼容
 
 % --- 核心宏包 ---
 \RequirePackage{geometry}

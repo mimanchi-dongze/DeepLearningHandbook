@@ -23,8 +23,8 @@ jobs:
         uses: xu-cheng/latex-action@v3
         with:
           root_file: main.tex
-          compiler: pdflatex
-          args: -pdf -interaction=nonstopmode -shell-escape
+          compiler: xelatex
+          args: -interaction=nonstopmode -shell-escape
           # Using latexmk internally via xu-cheng action
 
       - name: Upload PDF artifact
