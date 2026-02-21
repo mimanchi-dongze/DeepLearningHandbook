@@ -3,19 +3,18 @@
 
 随机过程是处理时间序列、扩散模型前向与反向加噪的核心数学工具。我们将在此探讨布朗运动与随机微分方程（SDE）。
 
-\section{布朗运动与维纳过程 (Brownian Motion \& Wiener Process)}
-
-维纳过程（Wiener Process）$W_t$ 是最基础的连续时间随机过程。其增量 $W_{t+\Delta t} - W_t$ 服从正态分布 $\mathcal{N}(0, \Delta t)$。
-
-\begin{rosetta}{维纳过程增量}
-    \begin{equation}
-        dW_t \sim \mathcal{N}(0, dt)
-    \end{equation}
-    \tcblower
-    \pyfunc{torch.randn(size) * torch.sqrt(dt)}
-\end{rosetta}
-
 \section{随机微分方程 (Stochastic Differential Equations)}
+
+\begin{variable}
+\begin{itemize}
+    \item $\mathbf{x} \in \mathbb{R}^d$: 系统状态（如图像张量的扁平化向量）。
+    \item $\mathbf{f}(\mathbf{x}, t) \in \mathbb{R}^d$: 漂移项 (Drift)，决定确定性的演化趋势。
+    \item $g(t) \in \mathbb{R}$: 扩散项 (Diffusion)，决定随机噪声的强度。
+    \item $\mathbf{w} \in \mathbb{R}^d$: 标准维纳过程，其微分 $d\mathbf{w}$ 代表白噪声。
+    \item $\epsilon \sim \mathcal{N}(0, 1)$: 标准正态分布采样，用于离散化模拟。
+\end{itemize}
+\end{variable}
+
 
 在扩散模型（如 Score-based Generative Models）中，数据受到由 SDE 控制的演化：
 \begin{equation}

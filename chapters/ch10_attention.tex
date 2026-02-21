@@ -5,6 +5,15 @@
 
 \section{缩放点积注意力 (Scaled Dot-Product Attention)}
 
+\begin{variable}
+\begin{itemize}
+    \item $Q \in \mathbb{R}^{N \times d_k}$: 查询矩阵 (Query)，$N$ 为序列长度。
+    \item $K \in \mathbb{R}^{M \times d_k}$: 键矩阵 (Key)，$M$ 为 Context 长度。
+    \item $V \in \mathbb{R}^{M \times d_v}$: 值矩阵 (Value)。
+    \item $d_k$: 键向量的维度，用于缩放因子 $\sqrt{d_k}$。
+\end{itemize}
+\end{variable}
+
 \begin{figure}[h]
     \centering
     \begin{tikzpicture}[

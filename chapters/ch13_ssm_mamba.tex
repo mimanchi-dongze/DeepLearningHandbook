@@ -5,6 +5,16 @@
 
 \section{连续系统数学模型 (ODE)}
 
+\begin{variable}
+\begin{itemize}
+    \item $h(t) \in \mathbb{R}^N$: 隐藏状态，代表系统的记忆，$N$ 为状态维度。
+    \item $\mathbf{A} \in \mathbb{R}^{N \times N}$: 演化矩阵，控制记忆的衰减与转换。
+    \item $\mathbf{B} \in \mathbb{R}^{N \times 1}$: 输入矩阵，将一维输入映射到 $N$ 维状态空间。
+    \item $\mathbf{C} \in \mathbb{R}^{1 \times N}$: 输出矩阵，将状态空间重新映射回输出信号。
+    \item $\Delta$: 离散化步长，控制采样的时间密度。
+\end{itemize}
+\end{variable}
+
 状态空间模型本质上是将输入信号 $x(t) \in \mathbb{R}$ 映射到隐藏状态 $h(t) \in \mathbb{R}^N$，再投影到输出 $y(t) \in \mathbb{R}$ 的常微分方程。
 
 \begin{rosetta}{连续域常微分方程}

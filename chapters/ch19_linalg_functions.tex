@@ -5,6 +5,15 @@
 
 \section{矩阵分解 (Matrix Decomposition)}
 
+\begin{variable}
+\begin{itemize}
+    \item $A \in \mathbb{R}^{m \times n}$: 待分解的原始矩阵。
+    \item $U \in \mathbb{R}^{m \times m}$: 左奇异向量矩阵，其列向量是 $AA^T$ 的特征向量。
+    \item $\Sigma \in \mathbb{R}^{m \times n}$: 奇异值矩阵，对角线上的元素 $\sigma_i$ 为奇异值。
+    \item $V \in \mathbb{R}^{n \times n}$: 右奇异向量矩阵，其列向量是 $A^T A$ 的特征向量。
+\end{itemize}
+\end{variable}
+
 \subsection{奇异值分解 (SVD)}
 SVD 将任何矩阵分解为旋转、缩放和旋转三个过程。在深度学习中，常用于 LoRA 的权重初始化或模型压缩。
 
