@@ -24,7 +24,9 @@ jobs:
         with:
           root_file: main.tex
           compiler: xelatex
-          args: -pdfxe -interaction=nonstopmode -shell-escape
+          # -g forces latexmk to process regardless of timestamps
+          # -f forces it to continue even with errors (sometimes helpful for bibliography/toc sync)
+          args: -pdfxe -g -interaction=nonstopmode -shell-escape
           # Using latexmk internally via xu-cheng action
 
       - name: Upload PDF artifact
