@@ -3,6 +3,16 @@
 
 生成模型旨在学习数据的概率分布 $p(x)$，从而生成新的样本。
 
+\begin{notation}
+\begin{itemize}
+    \item $x$: Input tensor
+    \item $\theta$: Model parameters
+    \item $\sigma$: Activation function
+    \item $\mu$: Mean
+\end{itemize}
+\end{notation}
+
+\mnote{$x$: Input tensor \\ $\theta$: Model parameters \\ $\sigma$: Activation function \\ $\mu$: Mean}
 \section{VAE (Variational Autoencoder)}
 VAE 通过最大化变分下界（ELBO）来训练。
 

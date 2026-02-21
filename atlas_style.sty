@@ -152,8 +152,8 @@
 }
 
 % --- Notation & Variable Environments ---
-\RequirePackage{marginnote}
-\newcommand{\mnote}[1]{\marginnote{\linespread{1.1}\footnotesize\sffamily\color{deepgrey}#1}}
+\RequirePackage{marginfix} % 自动修复边栏重叠
+\newcommand{\mnote}[1]{\marginpar{\linespread{1.1}\footnotesize\sffamily\color{deepgrey}#1}}
 
 \newtcolorbox{notation}[1][]{
     enhanced, breakable, sharp corners, boxrule=0pt, frame hidden,

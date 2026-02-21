@@ -3,6 +3,15 @@
 
 当大模型具备涌现能力后，下一步是让其输出符合人类偏好（对齐），并能在消费级硬件上运行（量化）。
 
+\begin{notation}
+\begin{itemize}
+    \item $y$: Output label
+    \item $\theta$: Model parameters
+    \item $\sigma$: Activation function
+\end{itemize}
+\end{notation}
+
+\mnote{$y$: Output label \\ $\theta$: Model parameters \\ $\sigma$: Activation function}
 \section{直接偏好优化 (DPO)}
 彻底绕过了传统 RLHF 中复杂的强化学习 (PPO) 训练流程，直接在偏好数据上优化语言模型本身。
 

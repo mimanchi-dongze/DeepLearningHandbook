@@ -3,6 +3,15 @@
 
 PyTorch 的核心引擎是 Autograd，它实现了自动化的反向传播。
 
+\begin{notation}
+\begin{itemize}
+    \item $x$: Input tensor
+    \item $y$: Output label
+    \item $\mathbf{x}$: Input vector
+\end{itemize}
+\end{notation}
+
+\mnote{$x$: Input tensor \\ $y$: Output label \\ $\mathbf{x}$: Input vector}
 \section{计算图与链式法则}
 深度学习模型可以看作是有向无环图（DAG），其中节点是张量，边是数学运算。
 

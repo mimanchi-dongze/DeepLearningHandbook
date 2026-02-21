@@ -3,6 +3,19 @@
 
 当模型规模增长至百亿甚至千亿参数时，全参微调（Full Fine-Tuning）的显存和计算成本难以承受。低秩自适应（Low-Rank Adaptation, LoRA）通过极少的额外参数，保留了原始知识并适应新任务。
 
+\begin{notation}
+\begin{itemize}
+    \item $x$: Input tensor
+    \item $y$: Output label
+    \item $W$: Weight matrix
+    \item $\sigma$: Activation function
+    \item $\mathbf{x}$: Input vector
+    \item $h$: Hidden state
+\end{itemize}
+\end{notation}
+
+\mnote{$x$: Input tensor \\ $y$: Output label \\ $W$: Weight matrix \\ $\sigma$: Activation function \\ $\mathbf{x}$: Input vector}
+\mnote{$h$: Hidden state}
 \section{矩阵低秩分解}
 
 LoRA 的核心思想是冻结预训练模型的权重矩阵，并通过旁路的两个低秩矩阵之积来表示权重的增量（$\Delta W$）。

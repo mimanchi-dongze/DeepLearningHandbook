@@ -3,6 +3,19 @@
 
 现代大语言模型（如 LLaMA、Mixtral）在 Transformer 基础架构上引入了更高效的算子，极大增强了模型的外推能力与推理速度。
 
+\begin{notation}
+\begin{itemize}
+    \item $x$: Input tensor
+    \item $y$: Output label
+    \item $W$: Weight matrix
+    \item $\theta$: Model parameters
+    \item $\sigma$: Activation function
+    \item $\mathbf{x}$: Input vector
+\end{itemize}
+\end{notation}
+
+\mnote{$x$: Input tensor \\ $y$: Output label \\ $W$: Weight matrix \\ $\theta$: Model parameters \\ $\sigma$: Activation function}
+\mnote{$\mathbf{x}$: Input vector}
 \section{RMSNorm (Root Mean Square Normalization)}
 抛弃了均值平移（Mean-centering），仅使用均方根缩放，从而节省了计算开销而性能基本无损。
 
