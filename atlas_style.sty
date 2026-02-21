@@ -15,7 +15,6 @@
 \tcbuselibrary{skins, breakable}
 \RequirePackage{titlesec}
 \RequirePackage{fancyhdr}
-\RequirePackage{tocloft}
 \RequirePackage{natbib}
 \RequirePackage{hyperref}
 \RequirePackage{tikz}
@@ -57,15 +56,12 @@
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\headrule}{\hbox to\headwidth{\color{gray}\leaders\hrule\hfill}}
 
-% --- 目录美化 ---
-\RequirePackage{tocloft}
-\renewcommand{\contentsname}{\hfill 目录 (Contents) \hfill}
-\renewcommand{\cftaftertoctitle}{\hfill}
-\renewcommand{\cftchapfont}{\large\bfseries\color{maintheme}}
-\renewcommand{\cftchappagefont}{\bfseries\color{maintheme}}
-\setlength{\cftbeforechapskip}{1.5ex}
-\renewcommand{\cftsecdotsep}{\cftnodots}
-\renewcommand{\cftsecfont}{\normalfont}
+% --- 目录美化 (使用 ctex 接口) ---
+\renewcommand{\contentsname}{\hfill \huge\bfseries\color{maintheme} 目录 (Contents) \hfill}
+\ctexset{
+  chapter/tocline = {\CTEXifname{\bfseries\color{maintheme}\thecontentslabel\quad}{}#2\titlerule*[1pc]{.}\contentspage},
+  section/tocline = {\CTEXifname{\thecontentslabel\quad}{}#2\titlerule*[1pc]{.}\contentspage},
+}
 
 % --- 章节标题美化 ---
 \titleformat{\chapter}[display]
