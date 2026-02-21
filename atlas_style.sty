@@ -17,6 +17,7 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{natbib}
 \RequirePackage{hyperref}
+\RequirePackage{bookmark}
 \RequirePackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, shadows, fit, backgrounds, calc, decorations.pathmorphing}
 
@@ -56,12 +57,17 @@
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\headrule}{\hbox to\headwidth{\color{gray}\leaders\hrule\hfill}}
 
-% --- 目录美化 (使用 ctex 接口) ---
+% --- 目录美化 ---
+\RequirePackage{titletoc}
 \renewcommand{\contentsname}{\hfill \huge\bfseries\color{maintheme} 目录 (Contents) \hfill}
-\ctexset{
-  chapter/tocline = {\CTEXifname{\bfseries\color{maintheme}\thecontentslabel\quad}{}#2\titlerule*[1pc]{.}\contentspage},
-  section/tocline = {\CTEXifname{\thecontentslabel\quad}{}#2\titlerule*[1pc]{.}\contentspage},
-}
+
+\titlecontents{chapter}[0em]{\addvspace{1.5pc}\bfseries\color{maintheme}}
+{\thecontentslabel\quad}{}
+{\titlerule*[0.7pc]{.}\contentspage}
+
+\titlecontents{section}[2em]{\addvspace{0.5pc}}
+{\thecontentslabel\quad}{}
+{\titlerule*[0.7pc]{.}\contentspage}
 
 % --- 章节标题美化 ---
 \titleformat{\chapter}[display]

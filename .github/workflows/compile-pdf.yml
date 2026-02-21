@@ -23,8 +23,8 @@ jobs:
         uses: xu-cheng/latex-action@v3
         with:
           root_file: main.tex
-          latexmk_use_xelatex: true
-          args: -interaction=nonstopmode -shell-escape
+          # latexmk is the default, we just need to tell it to use xelatex and keep going
+          args: -pdfxe -interaction=nonstopmode -shell-escape
           # Using latexmk internally via xu-cheng action
 
       - name: Upload PDF artifact
