@@ -1,0 +1,57 @@
+\chapter{归一化层}
+\label{ch:norm}
+
+归一化技术通过重新调整神经元输入的分布，加速模型收敛并提高训练稳定性。
+
+\marginpar{
+    \centering
+    \begin{tikzpicture}[scale=0.6, transform shape]
+        % BN Block
+        \node[block, minimum height=2.5cm, minimum width=1cm] (BN) {N};
+        \node[above=0.1cm of BN, font=\sffamily\scriptsize] {Batch Norm};
+        \draw[conn] (-1.5, 0.5) -- (BN.west |- 0, 0.5);
+        \draw[conn] (-1.5, -0.5) -- (BN.west |- 0, -0.5);
+        \draw[arrow_blue] (BN.east |- 0, 0.5) -- (1.5, 0.5);
+        \draw[arrow_blue] (BN.east |- 0, -0.5) -- (1.5, -0.5);
+        
+        % LN Block
+        \node[block_green, minimum height=1cm, minimum width=2.5cm, below=2cm of BN] (LN) {C};
+        \node[above=0.1cm of LN, font=\sffamily\scriptsize] {Layer Norm};
+        \draw[conn] (LN.west |- 0, -2.5) ++(-1.5, 0) -- (LN.west |- 0, -2.5);
+        \draw[arrow_blue] (LN.east |- 0, -2.5) -- ++(1.5, 0);
+    \end{tikzpicture}
+    \captionof{figure}{BN vs LN Dimension}
+}
+
+\section{Batch Normalization (批归一化)}
+针对整个 Mini-batch 的相同通道进行归一化。
+
+\begin{rosetta}{Batch Norm 1D/2D}
+    \textbf{训练期公式}:
+    \begin{equation}
+        \hat{x} = \frac{x - \mathrm{E}[x]}{\sqrt{\mathrm{Var}[x] + \epsilon}} \cdot \gamma + \beta
+    \end{equation}
+    其中 $\mathrm{E}[x]$ 和 $\mathrm{Var}[x]$ 是在当前 Batch 和空间维度（若是 2D）上计算的均值和方差。
+    \textbf{推理期 (Eval)}: 使用训练期间积累的运行均值 (Running Mean) 和运行方差 (Running Var)。
+    \tcblower
+    \pyfunc{nn.BatchNorm2d(num\_features)}
+\end{rosetta}
+
+\section{Layer Normalization (层归一化)}
+针对单个样本的所有通道进行归一化，常用于 Transformer 等变长序列模型。
+
+\begin{rosetta}{Layer Norm}
+    \begin{equation}
+        y = \frac{x - \mathrm{E}_{layer}[x]}{\sqrt{\mathrm{Var}_{layer}[x] + \epsilon}} \cdot \gamma + \beta
+    \end{equation}
+    均值和方差在 \texttt{normalized\_shape} 指定的维度上计算。
+    \tcblower
+    \pyfunc{nn.LayerNorm(normalized\_shape)}
+\end{rosetta}
+
+\section{归一化维度对比}
+\begin{itemize}
+    \item \textbf{BatchNorm}: 跨样本计算 (Across $N$ dimension)。
+    \item \textbf{LayerNorm}: 跨通道/特征计算 (Across $C, H, W$ dimensions for a single sample)。
+    \item \textbf{InstanceNorm}: 针对单个通道、单个样本计算。
+\end{itemize}

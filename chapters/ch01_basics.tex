@@ -1,0 +1,77 @@
+\chapter{张量基础运算}
+\label{ch:basics}
+
+在深度学习中，张量（Tensor）是承载数据的基本容器。所有的复杂层最终都会分解为对这些多维数组的基础算子。
+
+\marginpar{
+    \centering
+    \begin{tikzpicture}[scale=0.8, transform shape]
+        \node[block] (A) {Tensor A};
+        \node[block_orange, below=0.6cm of A] (OP) {Operation};
+        \node[block_green, below=0.6cm of OP] (C) {Tensor C};
+        \draw[conn] (A) -- (OP);
+        \draw[arrow_blue] (OP) -- (C);
+    \end{tikzpicture}
+    \captionof{figure}{Tensor Operation Flow}
+}
+
+\section{逐元素运算 (Element-wise Operations)}
+
+\subsection{Hadamard 乘积}
+逐元素乘法是指两个形状相同的张量，对应位置的元素相乘。
+
+\begin{rosetta}{逐元素乘法}
+    \begin{equation}
+        C = A \odot B \quad \text{其中 } C_{i,j} = A_{i,j} \times B_{i,j}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.mul(A, B)} 或 \pyfunc{A * B}
+\end{rosetta}
+
+\subsection{幂运算}
+对张量中的每一个分量求 $n$ 次幂。
+
+\begin{rosetta}{幂运算}
+    \begin{equation}
+        y = x^n
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.pow(x, n)}
+\end{rosetta}
+
+\section{线性代数 (Linear Algebra)}
+
+\subsection{矩阵乘法}
+这是神经网络中线性变换的核心，常用于全连接层和注意力机制。
+
+\begin{rosetta}{矩阵乘法}
+    \begin{equation}
+        C = AB \implies C_{i,j} = \sum_{k=1}^{n} A_{i,k}B_{k,j}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.matmul(A, B)} 或 \pyfunc{A @ B}
+\end{rosetta}
+
+\subsection{转置}
+交换张量的维度，在矩阵中通常指行与列的互换。
+
+\begin{rosetta}{转置}
+    \begin{equation}
+        A_{i,j}^T = A_{j,i}
+    \end{equation}
+    \tcblower
+    \pyfunc{tensor.T} 或 \pyfunc{tensor.t()}
+\end{rosetta}
+
+\section{统计规约 (Reduction)}
+
+\subsection{L2 范数}
+计算向量或矩阵的模长。
+
+\begin{rosetta}{L2 范数}
+    \begin{equation}
+        \|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^{n} |x_i|^2}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.norm(x, p=2)}
+\end{rosetta}

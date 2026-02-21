@@ -1,0 +1,94 @@
+\documentclass[10pt,oneside,a4paper,openany]{book}
+
+% --- 样式与宏包加载 (由 atlas_style.sty 统一管理) ---
+\usepackage[UTF8, scheme=plain]{ctex}
+\usepackage{atlas_style}
+
+% --- 封面设计 (Times New Roman 风格) ---
+\title{
+    \vspace{2cm}
+    \Huge \textbf{\textcolor{maintheme}{Deep Learning Mathematics Atlas}} \\
+    \vspace{0.5cm}
+    \Huge \textbf{\textcolor{maintheme}{深度学习数学图鉴}} \\
+    \vspace{1cm}
+    \Large \textit{\color{gray} 从 PyTorch 算子到 LaTeX 定义的硬核映射}
+}
+\author{\Large Antigravity \& Sisyphus \& 吴东泽}
+\date{\vspace{1cm}\large \today \\ \vspace{0.5cm} \textbf{Edition 2.0}}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+
+\tableofcontents
+\newpage
+
+\chapter*{前言 (Preface)}
+\addcontentsline{toc}{chapter}{前言 (Preface)}
+
+深度学习在工程上的辉煌胜利，往往掩盖了其底层严谨的数学逻辑。对于当今的 AI 开发者/刚入学的研究生/想做深度学习项目的人/对这方面感兴趣的本科生而言，我们正面临着一个普遍的困境：\textbf{黑盒化的陷阱}。
+
+当我们敲下 \pyfunc{nn.Linear} 或 \pyfunc{nn.CrossEntropyLoss} 时，PyTorch 等现代框架以极其优雅的 API 替我们屏蔽了复杂的矩阵乘法、张量偏导与梯度流向。这种工程上的便利极大降低了入门门槛，但也让许多从业者逐渐沦为“调包侠”。
+
+然而，当你试图复现一篇顶会论文（如 LLaMA 的旋转位置编码 RoPE，或是 Mamba 的选择性状态空间），当你遭遇训练过程中诡异的 NaN（梯度爆炸），或是当你想手写 CUDA 算子进行极限推理加速时，你会痛苦地发现：\textbf{仅仅读懂 Python 代码已经远远不够了}。
+
+学术界的论文（Paper）是用纯粹的 LaTeX 数学语言写成的，而工程界的落地则是用 Python 和 C++ 堆砌的。这两者之间存在着巨大的认知鸿沟。本书正是为了打破这堵高墙，打造一块连接学术界与工程界的\textbf{罗塞塔石碑 (Rosetta Stone)}。
+
+在此版本中，我们引入了全新的“左右对照”排版风格，旨在提供更直观的数学与代码映射体验。
+
+\vspace{1cm}
+\begin{flushright}
+\textit{Antigravity \& Sisyphus \& 吴东泽} \\
+2026年2月
+\end{flushright}
+
+\mainmatter
+
+% --- 第一阶段：张量与基础 ---
+\part{基石篇 (Foundations)}
+\include{chapters/ch01_basics}
+\include{chapters/ch19_linalg_functions}
+\include{chapters/ch20_probability}
+\include{chapters/ch02_activations}
+
+% --- 第二阶段：解剖神经网络 ---
+\part{解剖篇 (Anatomy)}
+\include{chapters/ch03_layers}
+\include{chapters/ch04_layers_seq}
+\include{chapters/ch05_normalization}
+
+% --- 第三阶段：目标与距离 ---
+\part{目标篇 (Objectives)}
+\include{chapters/ch06_distance}
+\include{chapters/ch07_information_theory}
+
+% --- 第四阶段：动力与微积分 ---
+\part{动力篇 (Dynamics)}
+\include{chapters/ch08_autograd}
+\include{chapters/ch09_optimization}
+\include{chapters/ch21_stochastic}
+
+% --- 第五阶段：巅峰模型架构 ---
+\part{架构篇 (Architectures)}
+\include{chapters/ch10_attention}
+\include{chapters/ch11_generative}
+
+% --- 第六阶段：大模型纪元 (SOTA) ---
+\part{大模型纪元 (Foundation Models)}
+\include{chapters/ch12_llm_components}
+\include{chapters/ch13_ssm_mamba}
+\include{chapters/ch14_peft_lora}
+
+% --- 第七阶段：前沿探索 (The Frontiers) ---
+\part{前沿探索 (The Frontiers)}
+\include{chapters/ch15_adversarial_contrastive}
+\include{chapters/ch16_graph_vision}
+\include{chapters/ch17_alignment_quantization}
+\include{chapters/ch18_nextgen_generative}
+
+\backmatter
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

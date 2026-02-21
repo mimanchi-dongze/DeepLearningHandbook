@@ -1,0 +1,45 @@
+\chapter{优化算法}
+\label{ch:optim}
+
+优化算法决定了模型如何根据梯度更新权重。
+
+\section{随机梯度下降 (SGD)}
+
+\begin{rosetta}{带动量的 SGD}
+    \textbf{更新公式}:
+    \begin{align}
+        v_{t} &= \mu v_{t-1} + g_t \\
+        \theta_{t} &= \theta_{t-1} - \eta v_t
+    \end{align}
+    其中 $\mu$ 是动量因子，$g_t$ 是当前梯度，$\eta$ 是学习率。
+    \tcblower
+    \pyfunc{torch.optim.SGD(params, lr, momentum)}
+\end{rosetta}
+
+\section{Adam (Adaptive Moment Estimation)}
+结合了动量（Momentum）和自适应学习率（RMSProp）。
+
+\begin{rosetta}{Adam 更新规则}
+    \textbf{计算步骤}:
+    \begin{enumerate}
+        \item 一阶矩更新: $m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t$
+        \item 二阶矩更新: $v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$
+        \item 偏差修正: $\hat{m}_t = \frac{m_t}{1 - \beta_1^t} , \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}$
+        \item 参数更新: $\theta_t = \theta_{t-1} - \eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$
+    \end{enumerate}
+    \tcblower
+    \pyfunc{torch.optim.Adam(params, lr, betas=(0.9, 0.999))}
+\end{rosetta}
+
+\section{AdamW (Weight Decay Fix)}
+在 Adam 中，直接应用 L2 正则化会导致权重衰减效果不如 SGD。AdamW 将权重衰减直接作用于更新步骤。
+
+\begin{rosetta}{AdamW 更新规则}
+    \textbf{核心差异}:
+    \begin{equation}
+        \theta_t = \theta_{t-1} - \eta \left( \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} + \lambda \theta_{t-1} \right)
+    \end{equation}
+    其中 $\lambda$ 是权重衰减系数。
+    \tcblower
+    \pyfunc{torch.optim.AdamW(params, lr, weight\_decay)}
+\end{rosetta}

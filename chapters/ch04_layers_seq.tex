@@ -1,0 +1,65 @@
+\chapter{循环与序列层}
+\label{ch:layers_seq}
+
+针对序列数据，神经网络需要具备“记忆”能力，通过隐藏状态在时间步之间传递信息。
+
+\marginpar{
+    \centering
+    \begin{tikzpicture}[scale=0.7, transform shape]
+        \node[block] (RNN) {RNN Cell};
+        \node[data_node, below=0.8cm of RNN] (X) {$x_t$};
+        \node[data_node, above=0.8cm of RNN] (Y) {$h_t$};
+        \node[data_node, left=0.8cm of RNN] (Hprev) {$h_{t-1}$};
+        \node[data_node, right=0.8cm of RNN] (Hnext) {$h_{t}$};
+        
+        \draw[conn] (X) -- (RNN);
+        \draw[arrow_blue] (RNN) -- (Y);
+        \draw[conn] (Hprev) -- (RNN);
+        \draw[arrow_blue] (RNN) -- (Hnext);
+    \end{tikzpicture}
+    \captionof{figure}{RNN Time Step}
+}
+
+\section{RNN (Recurrent Neural Network)}
+最基础的循环单元，由于梯度消失问题，难以处理长序列。
+
+
+
+\begin{rosetta}{基础 RNN}
+    \begin{equation}
+        h_t = \tanh(W_{ih} x_t + b_{ih} + W_{hh} h_{t-1} + b_{hh})
+    \end{equation}
+    \tcblower
+    \pyfunc{nn.RNN(input\_size, hidden\_size)}
+\end{rosetta}
+
+\section{LSTM (Long Short-Term Memory)}
+通过引入“细胞状态”（Cell State）和门控机制，有效解决了长距离依赖问题。
+
+\begin{rosetta}{LSTM 门控逻辑}
+    \textbf{更新过程}:
+    \begin{align}
+        i_t &= \sigma(W_{ii} x_t + b_{ii} + W_{hi} h_{t-1} + b_{hi}) \quad \text{(输入门)} \\
+        f_t &= \sigma(W_{if} x_t + b_{if} + W_{hf} h_{t-1} + b_{hf}) \quad \text{(遗忘门)} \\
+        g_t &= \tanh(W_{ig} x_t + b_{ig} + W_{hg} h_{t-1} + b_{hg}) \quad \text{(细胞候选)} \\
+        o_t &= \sigma(W_{io} x_t + b_{io} + W_{ho} h_{t-1} + b_{ho}) \quad \text{(输出门)} \\
+        c_t &= f_t \odot c_{t-1} + i_t \odot g_t \quad \text{(细胞状态更新)} \\
+        h_t &= o_t \odot \tanh(c_t) \quad \text{(隐藏状态更新)}
+    \end{align}
+    \tcblower
+    \pyfunc{nn.LSTM(input\_size, hidden\_size)}
+\end{rosetta}
+
+\section{GRU (Gated Recurrent Unit)}
+LSTM 的简化版本，合并了门控，计算效率更高。
+
+\begin{rosetta}{GRU 逻辑}
+    \begin{align}
+        r_t &= \sigma(W_{ir} x_t + b_{ir} + W_{hr} h_{t-1} + b_{hr}) \quad \text{(重置门)} \\
+        z_t &= \sigma(W_{iz} x_t + b_{iz} + W_{hz} h_{t-1} + b_{hz}) \quad \text{(更新门)} \\
+        n_t &= \tanh(W_{in} x_t + b_{in} + r_t \odot (W_{hn} h_{t-1} + b_{hn})) \\
+        h_t &= (1 - z_t) \odot n_t + z_t \odot h_{t-1}
+    \end{align}
+    \tcblower
+    \pyfunc{nn.GRU(input\_size, hidden\_size)}
+\end{rosetta}

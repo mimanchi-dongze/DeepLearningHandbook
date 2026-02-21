@@ -1,0 +1,100 @@
+\chapter{高级线性代数算子}
+\label{ch:linalg_functions}
+
+线性代数算子是深度学习底层的动力引擎。除了基础的矩阵乘法外，诸如奇异值分解（SVD）、特征值分解和爱因斯坦求和约定（Einsum）在现代模型压缩、稳定训练和高性能计算中扮演着至关重要的角色。
+
+\section{矩阵分解 (Matrix Decomposition)}
+
+\subsection{奇异值分解 (SVD)}
+SVD 将任何矩阵分解为旋转、缩放和旋转三个过程。在深度学习中，常用于 LoRA 的权重初始化或模型压缩。
+
+\begin{rosetta}{奇异值分解 (SVD)}
+    \begin{equation}
+        A = U \Sigma V^T
+    \end{equation}
+    其中：
+    \begin{itemize}
+        \item $U, V$ 是正交矩阵。
+        \item $\Sigma$ 是对角矩阵，包含奇异值。
+    \end{itemize}
+    \tcblower
+    \pyfunc{U, S, Vh = torch.linalg.svd(A)}
+\end{rosetta}
+
+\subsection{QR 分解}
+QR 分解将矩阵分解为一个正交矩阵 $Q$ 和一个上三角矩阵 $R$。常用于数值稳定性要求极高的线性方程组求解。
+
+\begin{rosetta}{QR 分解}
+    \begin{equation}
+        A = QR
+    \end{equation}
+    其中 $Q^T Q = I$，$R$ 为上三角。
+    \tcblower
+    \pyfunc{Q, R = torch.linalg.qr(A)}
+\end{rosetta}
+
+\section{矩阵属性与度量}
+
+\subsection{行列式与逆}
+虽然在反向传播中较少直接求逆，但在概率图模型或雅可比行列式计算中不可或缺。
+
+\begin{rosetta}{行列式与逆矩阵}
+    \begin{equation}
+        \det(A) \cdot A^{-1} = \text{adj}(A)
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.linalg.det(A)} \\
+    \pyfunc{torch.linalg.inv(A)}
+\end{rosetta}
+
+\subsection{矩阵范数 (Matrix Norm)}
+用于度量矩阵的“大小”，在谱归一化（Spectral Normalization）中特指算子范数。
+
+\begin{rosetta}{谱范数 (Spectral Norm)}
+    \begin{equation}
+        \|A\|_2 = \sigma_{\max}(A)
+    \end{equation}
+    即矩阵最大奇异值。
+    \tcblower
+    \pyfunc{torch.linalg.matrix\_norm(A, ord=2)}
+\end{rosetta}
+
+\section{高级张量约定}
+
+\subsection{爱因斯坦求和约定 (Einsum)}
+Einsum 是处理多维张量收缩的“瑞士军刀”，能以极简语法实现转置、乘法、迹和外积。
+
+\begin{rosetta}{Einstein Summation}
+    \begin{equation}
+        C_{ij} = \sum_{k} A_{ik} B_{kj} \implies \texttt{ik,kj->ij}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.einsum('ik,kj->ij', A, B)}
+\end{rosetta}
+
+\subsection{批量矩阵乘法 (BMM)}
+在处理 Batch 数据（如 Attention 权重）时，高效处理前两个维度外的矩阵乘法。
+
+\begin{rosetta}{Batch MatMul}
+    \begin{equation}
+        C_{b,i,j} = \sum_{k} A_{b,i,k} B_{b,k,j}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.bmm(A, B)}
+\end{rosetta}
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.8cm, font=\sffamily\small]
+    % SVD 示意图
+    \node[data_node, fill=brandblue!10, minimum height=2cm] (A) {$A$};
+    \node[right=1cm of A] (eq) {$=$};
+    \node[data_node, right=1cm of eq, fill=brandorange!10, minimum height=2cm] (U) {$U$};
+    \node[data_node, right=0.2cm of U, fill=brandgreen!10, minimum height=1cm, minimum width=1cm] (S) {$\Sigma$};
+    \node[data_node, right=0.2cm of S, fill=brandblue!5, minimum width=2cm, minimum height=2cm] (V) {$V^T$};
+    
+    \node[layer_label, below=0.2cm of A] {Matrix};
+    \node[layer_label, below=0.2cm of U] {Orthogonal};
+    \node[layer_label, below=0.7cm of S] {Singular};
+    \node[layer_label, below=0.2cm of V] {Orthogonal};
+\end{tikzpicture}
+\end{center}

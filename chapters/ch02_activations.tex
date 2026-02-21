@@ -1,0 +1,60 @@
+\chapter{激活函数}
+\label{ch:activations}
+
+激活函数通过引入非线性变换，使得神经网络能够拟合极其复杂的函数分布。
+
+\marginpar{
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        \draw[->, gray] (-2,0) -- (2,0) node[right] {$x$};
+        \draw[->, gray] (0,-1) -- (0,2) node[above] {$y$};
+        \draw[thick, brandorange] (-1.5,0) -- (0,0) -- (1.5,1.5) node[right] {ReLU};
+    \end{tikzpicture}
+    \captionof{figure}{ReLU Function}
+}
+
+\section{常用激活函数}
+
+\subsection{ReLU (Rectified Linear Unit)}
+ReLU 是深度学习中最常用的激活函数，因其计算简单且能有效缓解梯度消失问题。
+
+\begin{rosetta}{ReLU 激活函数}
+    \begin{equation}
+        \text{ReLU}(x) = \max(0, x)
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.relu(x)} 或 \pyfunc{nn.ReLU()}
+\end{rosetta}
+
+\subsection{Sigmoid}
+将输入映射到 $(0, 1)$ 区间，常用于二分类问题的概率预测。
+
+\begin{rosetta}{Sigmoid 激活函数}
+    \begin{equation}
+        \sigma(x) = \frac{1}{1 + e^{-x}}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.sigmoid(x)} 或 \pyfunc{nn.Sigmoid()}
+\end{rosetta}
+
+\subsection{Tanh (双曲正切)}
+将输入映射到 $(-1, 1)$ 区间，输出均值为 0，在某些网络中比 Sigmoid 收敛更快。
+
+\begin{rosetta}{Tanh 激活函数}
+    \begin{equation}
+        \tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.tanh(x)} 或 \pyfunc{nn.Tanh()}
+\end{rosetta}
+
+\subsection{Softmax}
+常用于多分类任务的输出层，将一组向量转化为概率分布。
+
+\begin{rosetta}{Softmax 函数}
+    \begin{equation}
+        \text{Softmax}(x_i) = \frac{e^{x_i}}{\sum_{j=1}^{C} e^{x_j}}
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.softmax(x, dim)}
+\end{rosetta}

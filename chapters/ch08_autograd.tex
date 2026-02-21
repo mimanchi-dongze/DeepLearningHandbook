@@ -1,0 +1,32 @@
+\chapter{自动求导与计算图}
+\label{ch:autograd}
+
+PyTorch 的核心引擎是 Autograd，它实现了自动化的反向传播。
+
+\section{计算图与链式法则}
+深度学习模型可以看作是有向无环图（DAG），其中节点是张量，边是数学运算。
+
+\section{Vector-Jacobian Product (VJP)}
+在反向传播中，我们需要计算输出对输入的导数。对于函数 $\mathbf{y} = f(\mathbf{x})$，其雅可比矩阵 (Jacobian) $J$ 定义为 $J_{ij} = \frac{\partial y_i}{\partial x_j}$。
+
+然而，PyTorch 并不显式计算整个矩阵（因为对于大型参数，这会导致内存溢出），而是计算 **Vector-Jacobian Product**。
+
+\begin{rosetta}{VJP 公式}
+    设上一层传回的梯度向量为 $\mathbf{v} = \frac{\partial L}{\partial \mathbf{y}}$，则当前层的梯度计算为：
+    \begin{equation}
+        \mathbf{v}^T J = \left[ \frac{\partial L}{\partial y_1}, \dots, \frac{\partial L}{\partial y_m} \right] 
+        \begin{bmatrix}
+            \frac{\partial y_1}{\partial x_1} & \dots & \frac{\partial y_1}{\partial x_n} \\
+            \vdots & \ddots & \vdots \\
+            \frac{\partial y_m}{\partial x_1} & \dots & \frac{\partial y_m}{\partial x_n}
+        \end{bmatrix}
+    \end{equation}
+    结果即为 $\frac{\partial L}{\partial \mathbf{x}}$。
+\end{rosetta}
+
+\section{PyTorch 操作}
+\begin{itemize}
+    \item \pyfunc{requires\_grad=True}: 标记该张量需要追踪操作以计算梯度。
+    \item \pyfunc{backward()}: 触发从当前节点开始的反向传播。
+    \item \pyfunc{grad}: 存储计算得到的梯度值。
+\end{itemize}

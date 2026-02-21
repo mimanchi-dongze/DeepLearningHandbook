@@ -1,0 +1,30 @@
+\chapter{下一代生成法则}
+\label{ch:nextgen_generative}
+
+超越经典的 VAE 与基础扩散模型，当代生成大模型（图像、视频）采用了更强大的引导机制与流模型数学框架。
+
+\section{无分类器引导 (CFG - Classifier-Free Guidance)}
+Stable Diffusion 系列模型“听懂”人类 Prompt 的绝对核心数学技巧。
+
+\begin{rosetta}{CFG 向量外插}
+    在每个去噪步 $t$，模型同时预测有条件（Prompt $c$）和无条件（空文本 $\emptyset$）的噪声。
+    \begin{equation}
+        \hat{\epsilon}_\theta(x_t, c) = \epsilon_\theta(x_t, \emptyset) + w \cdot \left( \epsilon_\theta(x_t, c) - \epsilon_\theta(x_t, \emptyset) \right)
+    \end{equation}
+    其中 $w$ 即为 \texttt{guidance\_scale}。当 $w > 1$ 时，它在几何空间中强行放大了向条件 $c$ 靠近的方向向量，从而生成高度匹配 Prompt 但可能略微降低多样性的图像。
+\end{rosetta}
+
+\section{流匹配与整流 (Flow Matching \& Rectified Flows)}
+Sora 和 Stable Diffusion 3 抛弃了传统的 DDPM 马尔可夫链，转向基于连续常微分方程 (ODE) 的直接轨迹预测。
+
+\begin{rosetta}{Rectified Flows (ODE)}
+    建立一条从纯噪声 $X_0 \sim \mathcal{N}(0, I)$ 到真实数据 $X_1$ 的直线轨迹：
+    \begin{equation}
+        X_t = t X_1 + (1 - t) X_0, \quad t \in [0, 1]
+    \end{equation}
+    神经网络 $v_\theta(X_t, t)$ 的目标是直接预测这条直线的导数（即流场）：
+    \begin{equation}
+        \mathcal{L} = \mathbb{E}_{t, X_0, X_1} \left[ \| v_\theta(X_t, t) - (X_1 - X_0) \|_2^2 \right]
+    \end{equation}
+    这比扩散模型试图预测加入的随机噪声在数学上更加优美，且在采样时能以极少的步数求得 ODE 积分。
+\end{rosetta}

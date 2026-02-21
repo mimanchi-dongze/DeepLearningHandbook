@@ -1,0 +1,54 @@
+\chapter{距离与相似度度量}
+\label{ch:distance}
+
+度量空间是机器学习的基础。在优化模型时，我们需要数学工具来衡量两个向量或分布的相似程度。
+
+\marginpar{
+    \centering
+    \begin{tikzpicture}[scale=0.8, transform shape]
+        \draw[<->, thick, gray] (0,2) node[above]{$y$} -- (0,0) -- (2.5,0) node[right]{$x$};
+        \coordinate (A) at (0.5,0.5);
+        \coordinate (B) at (2,1.5);
+        \draw[arrow_blue] (0,0) -- (A) node[below right, font=\sffamily\scriptsize]{$\mathbf{u}$};
+        \draw[arrow_blue] (0,0) -- (B) node[above left, font=\sffamily\scriptsize]{$\mathbf{v}$};
+        \draw[dashed, brandorange, thick] (A) -- (B) node[midway, above left, font=\sffamily\scriptsize]{$L_2$};
+        \draw[dashed, brandgreen, thick] (A) -| (B) node[near end, right, font=\sffamily\scriptsize]{$L_1$};
+    \end{tikzpicture}
+    \captionof{figure}{Distance Metrics}
+}
+
+\section{欧氏距离与均方误差 (MSE)}
+在欧几里得空间中，两点之间的直线距离。
+
+\begin{rosetta}{MSE / L2 Loss}
+    \begin{equation}
+        \text{MSE}(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2 = \frac{1}{N} \| \mathbf{y} - \mathbf{\hat{y}} \|_2^2
+    \end{equation}
+    从概率学角度，MSE 对应于目标变量服从高斯分布时的最大似然估计。
+    \tcblower
+    \pyfunc{nn.MSELoss()}
+\end{rosetta}
+
+\section{曼哈顿距离与 L1 Loss}
+计算绝对误差，对异常值（Outliers）比 MSE 更具鲁棒性。
+
+\begin{rosetta}{L1 Loss / MAE}
+    \begin{equation}
+        \text{MAE}(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{N} \sum_{i=1}^{N} |y_i - \hat{y}_i| = \frac{1}{N} \| \mathbf{y} - \mathbf{\hat{y}} \|_1
+    \end{equation}
+    对应于目标变量服从拉普拉斯分布时的最大似然估计。
+    \tcblower
+    \pyfunc{nn.L1Loss()}
+\end{rosetta}
+
+\section{余弦相似度 (Cosine Similarity)}
+用于衡量两个向量方向的差异，不考虑向量的绝对大小。常用于文本嵌入（Embeddings）匹配。
+
+\begin{rosetta}{Cosine Similarity}
+    \begin{equation}
+        \text{CosSim}(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2} = \frac{\sum u_i v_i}{\sqrt{\sum u_i^2} \sqrt{\sum v_i^2}}
+    \end{equation}
+    余弦距离定义为 $1 - \text{CosSim}$。
+    \tcblower
+    \pyfunc{nn.CosineSimilarity(dim)}
+\end{rosetta}

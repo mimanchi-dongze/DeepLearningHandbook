@@ -1,0 +1,91 @@
+\chapter{生成模型数学基础}
+\label{ch:generative}
+
+生成模型旨在学习数据的概率分布 $p(x)$，从而生成新的样本。
+
+\section{VAE (Variational Autoencoder)}
+VAE 通过最大化变分下界（ELBO）来训练。
+
+\subsection{重参数化技巧 (Reparameterization Trick)}
+为了让随机采样过程可导，我们将随机性转移到外部噪声。这使得梯度能够流过分布参数 $\mu$ 和 $\sigma$。
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, font=\sffamily\small]
+    % 标准正态噪声
+    \node[active_neuron] (eps) {$\epsilon$};
+    \node[layer_label, above=0.2cm of eps] {$\mathcal{N}(0, I)$};
+    
+    % 分布参数
+    \node[data_node, left=1.5cm of eps] (mu) {$\mu$};
+    \node[data_node, right=1.5cm of eps] (sigma) {$\sigma$};
+    
+    % 变换操作
+    \node[op_node, below=1cm of eps] (mul) {$\times$};
+    \node[op_node, below=2cm of eps] (add) {$+$};
+    
+    \draw[conn] (sigma) |- (mul);
+    \draw[conn] (eps) -- (mul);
+    \draw[conn] (mul) -- (add);
+    \draw[conn] (mu) |- (add);
+    
+    % 采样结果
+    \node[data_node, below=0.8cm of add] (z) {Latent $z$};
+    \draw[conn] (add) -- (z);
+    
+    % 梯度流向标注
+    \path[->, >=Stealth, brandorange, dashed, thick] (z.north) edge[bend left=30] node[left] {Gradient Flow} (mu.south);
+    \path[->, >=Stealth, brandorange, dashed, thick] (z.north) edge[bend right=30] node[right] {Gradient Flow} (sigma.south);
+\end{tikzpicture}
+\end{center}
+
+\begin{rosetta}{重参数化}
+    \begin{equation}
+        \mathbf{z} = \mu + \sigma \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+    \end{equation}
+    \tcblower
+    \texttt{z = mu + sigma * torch.randn\_like(sigma)}
+\end{rosetta}
+
+\subsection{ELBO 损失函数}
+VAE 的目标函数由两部分组成：重建误差和正则化项。
+
+\begin{rosetta}{VAE 损失定义}
+    \begin{equation}
+        \mathcal{L}_{VAE} = \mathbb{E}_{q(z|x)}[\log p(x|z)] - D_{KL}(q(z|x) \| p(z))
+    \end{equation}
+    其中第一项是重建似然（通常用 MSE 或 BCE），第二项是隐藏变量分布与先验分布（通常为标准正态）的 KL 散度。
+\end{rosetta}
+
+\section{Diffusion Model (扩散模型) 简介}
+扩散模型通过逐渐向数据添加噪声（正向过程）和学习去噪（逆向过程）来生成图像。
+
+\begin{center}
+\begin{tikzpicture}[node distance=2.5cm, font=\sffamily\small]
+    % 状态节点
+    \node[data_node, fill=brandblue!10] (x0) {$x_0$};
+    \node[data_node, right of=x0] (xt1) {$x_{t-1}$};
+    \node[data_node, right of=xt1] (xt) {$x_t$};
+    \node[data_node, right of=xt, fill=brandorange!10] (xT) {$x_T$};
+    
+    % 前向过程 (加噪)
+    \draw[data_flow, bend left=25] (x0) to node[above] {$q(x_{t-1}|x_0)$} (xt1);
+    \draw[data_flow, bend left=25] (xt1) to node[above] {$q(x_t|x_{t-1})$} (xt);
+    \draw[data_flow, bend left=25] (xt) to node[above] {$\dots$} (xT);
+    
+    % 逆向过程 (去噪)
+    \draw[conn, draw=brandorange, bend left=25] (xT) to node[below] {$p_\theta(x_{t-1}|x_t)$} (xt);
+    \draw[conn, draw=brandorange, bend left=25] (xt) to node[below] {$\dots$} (xt1);
+    \draw[conn, draw=brandorange, bend left=25] (xt1) to node[below] {$p_\theta(x_0|x_1)$} (x0);
+    
+    % 标签
+    \node[layer_label, below=0.3cm of x0] {DATA};
+    \node[layer_label, below=0.3cm of xT] {NOISE};
+\end{tikzpicture}
+\end{center}
+
+\begin{rosetta}{DDPM 正向扩散}
+    \begin{equation}
+        q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1-\beta_t}x_{t-1}, \beta_t I)
+    \end{equation}
+    通过重参数化，我们可以直接从 $x_0$ 计算 $x_t$。
+\end{rosetta}

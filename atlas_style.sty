@@ -1,0 +1,152 @@
+\ProvidesPackage{atlas_style}[2026/02/20 Rosetta Stone Style for Deep Learning Math]
+
+% --- 核心字体与编码 (pdflatex 兼容) ---
+\RequirePackage[T1]{fontenc}
+\RequirePackage{amsmath, amsfonts, amssymb}
+\RequirePackage{newtxtext}   % Times New Roman for text
+\RequirePackage{newtxmath}   % Times New Roman for math
+
+% --- 核心宏包 ---
+\RequirePackage{geometry}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{caption}
+\RequirePackage[many]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\RequirePackage{titlesec}
+\RequirePackage{fancyhdr}
+\RequirePackage{tocloft}
+\RequirePackage{natbib}
+\RequirePackage{hyperref}
+\RequirePackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, shadows, fit, backgrounds, calc, decorations.pathmorphing}
+
+% --- 配色定义 ---
+\definecolor{maintheme}{RGB}{34, 107, 128}      % 深青色
+\definecolor{brandblue}{RGB}{0, 114, 178}       % 现代蓝
+\definecolor{brandorange}{RGB}{213, 94, 0}      % 警告橙
+\definecolor{brandgreen}{RGB}{0, 158, 115}      % 代码绿
+\definecolor{softblue}{RGB}{235, 245, 250}
+\definecolor{codegrey}{RGB}{245, 245, 245}
+\definecolor{deepgrey}{RGB}{51, 51, 51}
+
+% --- 页面几何设置 (不对称宽侧栏) ---
+\geometry{
+    a4paper,
+    inner=2cm,
+    outer=5cm,
+    top=3cm,
+    bottom=3cm,
+    marginparsep=0.5cm,
+    marginparwidth=4cm
+}
+
+\hypersetup{colorlinks=true, linkcolor=maintheme, citecolor=maintheme, urlcolor=brandblue}
+
+% --- 段落排版 ---
+\linespread{1.3}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- 页眉页脚 ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\textcolor{gray}{\thepage}}
+\fancyhead[LO]{\textcolor{gray}{\leftmark}}
+\fancyhead[RE]{\textcolor{gray}{\rightmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{gray}\leaders\hrule\hfill}}
+
+% --- 目录美化 ---
+\@ifundefined{cftchapfont}{}{
+  \renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\color{maintheme}}
+  \renewcommand{\cftaftertoctitle}{\hfill\mbox{}\\[2ex]}
+  \renewcommand{\cftchapfont}{\large\bfseries\color{maintheme}}
+  \renewcommand{\cftchappagefont}{\bfseries\color{maintheme}}
+  \setlength{\cftbeforechapskip}{1.5ex}
+  \renewcommand{\cftsecdotsep}{\cftnodots}
+  \renewcommand{\cftsecfont}{\normalfont}
+}
+
+% --- 章节标题美化 ---
+\titleformat{\chapter}[display]
+  {\normalfont\Huge\bfseries\color{maintheme}}
+  {\titlerule[2pt]\vspace{2pt}\titlerule\vspace{1ex}\chaptertitlename\ \thechapter}
+  {1ex}
+  {\Huge}
+  [\vspace{1ex}\titlerule]
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{black}}
+  {\color{maintheme}\thesection}{1em}{}
+
+% --- 核心环境: 罗塞塔左右对照框 ---
+\newtcolorbox{rosetta}[2][]{
+    enhanced,
+    sidebyside,
+    sidebyside align=top,
+    sidebyside gap=6mm,
+    lower separated=true,
+    halign=left,
+    halign lower=center,
+    colback=white,
+    colframe=brandblue!30,
+    colbacktitle=brandblue!10,
+    coltitle=brandblue,
+    fonttitle=\bfseries\sffamily,
+    title=#2,
+    sharp corners,
+    boxrule=0.8pt,
+    titlerule=0pt,
+    drop fuzzy shadow,
+    bicolor,
+    colbacklower=codegrey,
+    segmentation style={dash pattern=on 3pt off 2pt, brandblue!40, thick},
+    #1
+}
+
+% --- 语义化扁平框 ---
+\newtcolorbox{flatblue}[2][]{
+    enhanced, breakable, sharp corners, boxrule=0pt, frame hidden,
+    borderline west={3pt}{0pt}{brandblue},
+    colback=softblue, coltitle=brandblue,
+    fonttitle=\bfseries\large\sffamily, title=#2,
+    attach title to upper, after title={\par\medskip},
+    left=10pt, right=10pt, top=10pt, bottom=10pt, #1
+}
+
+% --- 旧版兼容环境 ---
+\newtcolorbox{mathbox}[2][]{
+    enhanced, breakable, colback=white, colframe=brandblue!20,
+    colbacktitle=brandblue!5, coltitle=brandblue,
+    fonttitle=\bfseries\large\sffamily, title=#2,
+    attach boxed title to top left={yshift=-2mm, xshift=5mm},
+    boxed title style={enhanced, boxrule=0.5pt, colframe=white, shadow={0.3mm}{-0.3mm}{0mm}{black!10!white}},
+    shadow={0.5mm}{-0.5mm}{0mm}{black!10!white}, separator sign none,
+    top=12pt, bottom=8pt, left=10pt, right=10pt, #1
+}
+
+% --- 核心命令 ---
+\newcommand{\pyfunc}[1]{\texttt{\textbf{\textcolor{brandblue}{#1}}}}
+
+% --- TikZ 样式库 (Edition 2.2 Standard) ---
+\tikzset{
+    neuron/.style={circle, draw=brandblue, fill=brandblue!10, minimum size=20pt, thick, drop shadow={opacity=0.2}},
+    active_neuron/.style={circle, draw=brandorange, fill=brandorange!10, minimum size=20pt, thick, drop shadow={opacity=0.2}},
+    data_node/.style={rectangle, draw=brandgreen, fill=brandgreen!5, rounded corners=2pt, minimum height=25pt, minimum width=40pt, thick},
+    op_node/.style={circle, draw=brandorange, fill=brandorange!15, thick, inner sep=1pt, minimum size=18pt},
+    block/.style={rectangle, draw=brandblue!80, fill=brandblue!5, thick, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center, drop shadow={opacity=0.1}},
+    norm_block/.style={rectangle, draw=brandgreen!80, fill=brandgreen!5, thick, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center},
+    attn_block/.style={rectangle, draw=brandorange!80, fill=brandorange!5, thick, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center},
+    conn/.style={->, >=Stealth, brandblue!60, thick},
+    skip_conn/.style={->, >=Stealth, brandblue!40, thick, rounded corners=2mm},
+    data_flow/.style={->, >=Stealth, brandgreen!70, thick},
+    layer_label/.style={font=\sffamily\scriptsize\bfseries, color=deepgrey},
+    math_text/.style={font=\small\itshape},
+    container/.style={rectangle, draw=brandblue!30, fill=white, rounded corners=4pt, inner sep=10pt, dashed, thick},
+    block_orange/.style={block, draw=brandorange, fill=brandorange!10},
+    block_green/.style={block, draw=brandgreen, fill=brandgreen!10},
+    arrow_blue/.style={->, >=Stealth, thick, draw=brandblue}
+}
+
+\endinput

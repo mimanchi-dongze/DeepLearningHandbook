@@ -1,0 +1,70 @@
+\chapter{神经网络层}
+\label{ch:layers}
+
+神经网络层是参数的学习单元，它将基础算子封装成带有可学习权重的模块。
+
+\marginpar{
+    \centering
+    \begin{tikzpicture}[scale=0.75, transform shape]
+        % Input nodes
+        \foreach \i in {1,2,3} {
+            \node[neuron] (I\i) at (0,-\i*1.2) {};
+        }
+        % Hidden nodes
+        \foreach \j in {1,2} {
+            \node[active_neuron] (H\j) at (2,-0.6-\j*1.2) {};
+        }
+        % Connections
+        \foreach \i in {1,2,3} {
+            \foreach \j in {1,2} {
+                \draw[conn] (I\i) -- (H\j);
+            }
+        }
+        \node[layer_label] at (0,-4.5) {Input Layer};
+        \node[layer_label] at (2,-4.5) {Linear Layer};
+    \end{tikzpicture}
+    \captionof{figure}{Linear Layer (Fully Connected)}
+}
+
+\section{线性变换与卷积}
+
+\subsection{线性层 (Linear / Fully Connected)}
+执行仿射变换，是多层感知机（MLP）的核心。
+
+\begin{rosetta}{线性层}
+    \begin{equation}
+        \mathbf{y} = \mathbf{x} \mathbf{W}^T + \mathbf{b}
+    \end{equation}
+    其中 $\mathbf{W} \in \mathbb{R}^{out \times in}$ 是权重矩阵，$\mathbf{b} \in \mathbb{R}^{out}$ 是偏置向量。
+    \tcblower
+    \pyfunc{nn.Linear(in\_features, out\_features)}
+\end{rosetta}
+
+\subsection{2D 卷积层 (Convolutional Layer)}
+卷积层通过局部连接和权值共享提取空间特征。注意：PyTorch 实际执行的是互相关运算。
+
+\begin{rosetta}{2D 卷积}
+    \textbf{输出尺寸计算公式}:
+    \begin{equation}
+        H_{out} = \left\lfloor \frac{H_{in} + 2 \times \text{padding}[0] - \text{dilation}[0] \times (\text{kernel\_size}[0] - 1) - 1}{\text{stride}[0]} + 1 \right\rfloor
+    \end{equation}
+    \textbf{互相关运算定义}:
+    \begin{equation}
+        \text{out}(N_i, C_{out_j}) = \text{bias}(C_{out_j}) + \sum_{k=0}^{C_{in}-1} \text{weight}(C_{out_j}, k) \star \text{input}(N_i, k)
+    \end{equation}
+    其中 $\star$ 在此表示离散互相关：$(f \star g)(n) = \sum_{m} f(m)g(n+m)$。
+    \tcblower
+    \pyfunc{nn.Conv2d(in\_channels, out\_channels, kernel\_size, stride, padding)}
+\end{rosetta}
+
+\subsection{池化层 (Pooling Layers)}
+用于下采样，减少计算量并增强平移不变性。
+
+\begin{rosetta}{最大池化 (Max Pooling)}
+    \begin{equation}
+        \text{out}(C, h, w) = \max_{m, n} \text{input}(C, h \times S + m, w \times S + n)
+    \end{equation}
+    其中 $m, n$ 在卷积核大小范围内滑动。
+    \tcblower
+    \pyfunc{nn.MaxPool2d(kernel\_size)}
+\end{rosetta}

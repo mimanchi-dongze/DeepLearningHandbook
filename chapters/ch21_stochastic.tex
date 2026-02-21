@@ -1,0 +1,81 @@
+\chapter{随机过程 (Stochastic Processes)}
+\label{ch:stochastic}
+
+随机过程是处理时间序列、扩散模型前向与反向加噪的核心数学工具。我们将在此探讨布朗运动与随机微分方程（SDE）。
+
+\section{布朗运动与维纳过程 (Brownian Motion \& Wiener Process)}
+
+维纳过程（Wiener Process）$W_t$ 是最基础的连续时间随机过程。其增量 $W_{t+\Delta t} - W_t$ 服从正态分布 $\mathcal{N}(0, \Delta t)$。
+
+\begin{rosetta}{维纳过程增量}
+    \begin{equation}
+        dW_t \sim \mathcal{N}(0, dt)
+    \end{equation}
+    \tcblower
+    \pyfunc{torch.randn(size) * torch.sqrt(dt)}
+\end{rosetta}
+
+\section{随机微分方程 (Stochastic Differential Equations)}
+
+在扩散模型（如 Score-based Generative Models）中，数据受到由 SDE 控制的演化：
+\begin{equation}
+    d\mathbf{x} = \mathbf{f}(\mathbf{x}, t)dt + g(t)d\mathbf{w}
+\end{equation}
+
+其中 $\mathbf{f}(\mathbf{x}, t)$ 是漂移系数（Drift），$g(t)$ 是扩散系数（Diffusion）。
+
+\begin{rosetta}{欧拉-丸山方法 (Euler-Maruyama Method)}
+    对于 SDE $dx_t = f(x_t, t)dt + g(t)dw_t$，其数值离散解为：
+    \begin{equation}
+        x_{t+\Delta t} = x_t + f(x_t, t)\Delta t + g(t)\sqrt{\Delta t} \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, 1)
+    \end{equation}
+    \tcblower
+    \textbf{PyTorch 实现}:
+    \begin{verbatim}
+# x: current state, t: time, dt: step
+eps = torch.randn_like(x)
+drift = f(x, t) * dt
+diffusion = g(t) * torch.sqrt(dt) * eps
+x_next = x + drift + diffusion
+    \end{verbatim}
+\end{rosetta}
+
+\section{SDE 轨迹 (SDE Trajectories)}
+
+随机微分方程的每一次采样都会产生一条不同的轨迹（Trajectory）。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+        % Axes
+        \draw[->, thick] (0,0) -- (8,0) node[right] {$t$};
+        \draw[->, thick] (0,-3) -- (0,3) node[above] {$X_t$};
+        
+        % Data distribution at t=0
+        \draw[fill=maintheme, opacity=0.3] (0,1.5) ellipse (0.2 and 0.8);
+        \draw[fill=maintheme, opacity=0.3] (0,-1.5) ellipse (0.2 and 0.8);
+        \node[left] at (-0.3, 1.5) {$\text{Data}(t=0)$};
+        
+        % Trajectory 1
+        \draw[thick, draw=blue!70, decorate, decoration={random steps,segment length=5pt,amplitude=2.5pt}] 
+            (0,1.5) -- (1,1.2) -- (2,1.6) -- (3,0.5) -- (4,0.8) -- (5,0.1) -- (6,0.5) -- (7,0.2);
+            
+        % Trajectory 2
+        \draw[thick, draw=red!70, decorate, decoration={random steps,segment length=5pt,amplitude=2.5pt}] 
+            (0,-1.5) -- (1,-1.0) -- (2,-1.2) -- (3,-0.5) -- (4,0.1) -- (5,-0.2) -- (6,0.3) -- (7,-0.1);
+            
+        % Trajectory 3
+        \draw[thick, draw=green!70!black, decorate, decoration={random steps,segment length=5pt,amplitude=2.5pt}] 
+            (0,0.8) -- (1,1.5) -- (2,0.5) -- (3,0.8) -- (4,0.2) -- (5,0.6) -- (6,-0.2) -- (7,0.4);
+            
+        % Noise distribution at t=T
+        \draw[fill=gray, opacity=0.3] (7,0) ellipse (0.4 and 2);
+        \node[right] at (7.5, 0) {$\text{Noise}(t=T)$};
+        
+        \node[below] at (3.5, -2.5) {前向加噪过程 (Forward Process SDE)};
+    \end{tikzpicture}
+    \caption{数据分布通过随机微分方程演化为噪声分布的可能轨迹}
+    \label{fig:sde_trajectory}
+\end{figure}
+
+轨迹的演化展示了扩散模型前向加噪过程的几何直觉，数据逐步从复杂分布演化向各向同性的高斯分布。

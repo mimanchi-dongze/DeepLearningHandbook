@@ -1,0 +1,70 @@
+\chapter{大模型组件 (LLM Components)}
+\label{ch:llm_components}
+
+现代大语言模型（如 LLaMA、Mixtral）在 Transformer 基础架构上引入了更高效的算子，极大增强了模型的外推能力与推理速度。
+
+\section{RMSNorm (Root Mean Square Normalization)}
+抛弃了均值平移（Mean-centering），仅使用均方根缩放，从而节省了计算开销而性能基本无损。
+
+\begin{rosetta}{RMSNorm}
+    \begin{equation}
+        \text{RMSNorm}(x) = \frac{x}{\text{RMS}(x)} \odot \gamma \quad \text{其中 } \text{RMS}(x) = \sqrt{\frac{1}{d} \sum_{i=1}^{d} x_i^2 + \epsilon}
+    \end{equation}
+    这里 $\gamma$ 是可学习的缩放参数，$\epsilon$ 为防止除零的微小常数。
+    \tcblower
+    \pyfunc{x / torch.sqrt(torch.mean(x**2) + eps) * weight}
+\end{rosetta}
+
+\section{SwiGLU (Swish Gated Linear Unit)}
+LLaMA 中的默认激活机制，采用 Swish 变体控制信息流。
+
+\begin{rosetta}{SwiGLU}
+    \begin{equation}
+        \text{SwiGLU}(x, W, V) = \text{Swish}(xW) \odot xV
+    \end{equation}
+    \textbf{其中 Swish 函数定义为}:
+    \begin{equation}
+        \text{Swish}_{\beta}(z) = z \cdot \sigma(\beta z) = \frac{z}{1 + e^{-\beta z}}
+    \end{equation}
+    当 $\beta=1$ 时，即为 SiLU 函数。
+\end{rosetta}
+
+\section{RoPE (Rotary Position Embedding)}
+旋转位置编码通过将绝对位置注入为旋转矩阵，自然推导出了相对位置衰减特性。
+
+\begin{rosetta}{RoPE (旋转位置编码)}
+    对于位置 $m$ 的特征向量 $\mathbf{x} = [x_1, x_2, \dots, x_{d}]$，将其两两分组应用旋转矩阵：
+    \begin{equation}
+        f(\mathbf{x}, m) = \mathbf{x} R_{\Theta, m}^d
+    \end{equation}
+    \textbf{旋转矩阵 $R_{\Theta, m}^d$}:
+    \begin{equation}
+        \begin{bmatrix}
+            \cos m\theta_1 & -\sin m\theta_1 & 0 & 0 & \dots \\
+            \sin m\theta_1 & \cos m\theta_1 & 0 & 0 & \dots \\
+            0 & 0 & \cos m\theta_2 & -\sin m\theta_2 & \dots \\
+            0 & 0 & \sin m\theta_2 & \cos m\theta_2 & \dots \\
+            \vdots & \vdots & \vdots & \vdots & \ddots
+        \end{bmatrix}
+    \end{equation}
+    其中基频 $\theta_i = 10000^{-2(i-1)/d}$。
+\end{rosetta}
+
+\section{MoE (Mixture of Experts)}
+通过路由机制（Routing）让每个 Token 仅激活部分参数（如 Top-2），实现参数量扩大而不增加前向推理时间。
+
+\begin{rosetta}{Top-K 路由数学}
+    \textbf{路由权重}: 对于输入 $x$，专家 $E_i$ 的权重为：
+    \begin{equation}
+        G(x)_i = \begin{cases}
+            \frac{e^{x \cdot W_{r, i}}}{\sum_{j \in T} e^{x \cdot W_{r, j}}}, & \text{if } i \in T \\
+            0, & \text{otherwise}
+        \end{cases}
+    \end{equation}
+    其中 $T$ 是根据 $x \cdot W_r$ 选出的 Top-K 索引集合。
+    
+    \textbf{最终输出}:
+    \begin{equation}
+        y = \sum_{i=1}^{N} G(x)_i E_i(x)
+    \end{equation}
+\end{rosetta}

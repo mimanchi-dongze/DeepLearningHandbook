@@ -1,0 +1,90 @@
+\chapter{参数高效微调 (PEFT \& LoRA)}
+\label{ch:peft_lora}
+
+当模型规模增长至百亿甚至千亿参数时，全参微调（Full Fine-Tuning）的显存和计算成本难以承受。低秩自适应（Low-Rank Adaptation, LoRA）通过极少的额外参数，保留了原始知识并适应新任务。
+
+\section{矩阵低秩分解}
+
+LoRA 的核心思想是冻结预训练模型的权重矩阵，并通过旁路的两个低秩矩阵之积来表示权重的增量（$\Delta W$）。
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, font=\sffamily\small]
+    % 输入
+    \node (x) at (0,0) {$x \in \mathbb{R}^k$};
+    
+    % 主路径：冻结权重
+    \node[block, above=1cm of x, minimum height=3cm, fill=brandblue!10] (w0) {Frozen Pretrained \\ $W_0 \in \mathbb{R}^{d \times k}$};
+    \draw[conn] (x) -- (w0);
+    
+    % 旁路：LoRA 路径
+    \node[data_node, right=2cm of w0] (matA) {$A \in \mathbb{R}^{r \times k}$};
+    \node[data_node, above=1.5cm of matA] (matB) {$B \in \mathbb{R}^{d \times r}$};
+    
+    \draw[conn] (x.east) -- ++(1,0) |- (matA.west);
+    \draw[conn] (matA) -- node[right, math_text] {rank $r \ll d, k$} (matB);
+    
+    % 合并
+    \node[op_node, above=4.5cm of x] (sum) {$+$};
+    \draw[conn] (w0) -- (sum);
+    \draw[conn] (matB) |- (sum);
+    
+    % 输出
+    \node[above=0.8cm of sum] (out) {$h = W_0 x + BAx$};
+    \draw[conn] (sum) -- (out);
+
+    % 标注
+    \begin{scope}[on background layer]
+        \node[container, fit=(matA) (matB)] (lorabox) {};
+        \node[anchor=south west, brandorange] at (lorabox.north west) {Trainable LoRA};
+    \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\begin{rosetta}{LoRA 更新公式}
+    设预训练权重矩阵为 $W_0 \in \mathbb{R}^{d \times k}$，冻结不变。
+    更新量 $\Delta W$ 通过两个低秩矩阵 $B \in \mathbb{R}^{d \times r}$ 和 $A \in \mathbb{R}^{r \times k}$ 乘积得到：
+    \begin{equation}
+        W = W_0 + \Delta W = W_0 + B A
+    \end{equation}
+    其中秩 $r \ll \min(d, k)$，例如 $r=8$ 或 $r=64$。
+\end{rosetta}
+
+\section{前向传播与初始化}
+
+\subsection{前向计算逻辑}
+对于输入 $\mathbf{x} \in \mathbb{R}^k$，全连接层的原本输出为 $h = W_0 \mathbf{x}$。引入 LoRA 之后，前向传播变为两个并行的矩阵乘法最后相加。
+
+\begin{rosetta}{LoRA 前向传播}
+    \begin{equation}
+        h = W_0 \mathbf{x} + \frac{\alpha}{r} B A \mathbf{x}
+    \end{equation}
+    其中 $\alpha$ 是一个缩放超参数，在初始阶段控制新加入参数对最终结果的影响。当秩 $r$ 改变时，可以通过 $\frac{\alpha}{r}$ 保持方差稳定。
+    \tcblower
+    \pyfunc{y = F.linear(x, W0) + F.linear(x, B @ A) * (alpha / r)}
+\end{rosetta}
+
+\subsection{零初始化技巧}
+为了保证在训练刚开始时（即第一个 Step 前），引入的 LoRA 模块不会破坏预训练模型的行为，矩阵 $A$ 和 $B$ 的初始化至关重要。
+
+\begin{rosetta}{LoRA 初始化}
+    \textbf{矩阵 A}: 使用标准正态分布初始化（Gaussian / Kaiming）。
+    \begin{equation}
+        A \sim \mathcal{N}(0, \sigma^2)
+    \end{equation}
+    \textbf{矩阵 B}: 必须使用全零矩阵初始化。
+    \begin{equation}
+        B = \mathbf{0} \implies B A = \mathbf{0}
+    \end{equation}
+    这样，初始状态下 $\Delta W = 0$，保证了 $h = W_0 \mathbf{x}$ 与原始模型输出完全一致。
+\end{rosetta}
+
+\section{推理合并 (Merging Weights)}
+
+在推理阶段，由于矩阵乘法的分配律，我们可以直接将 $BA$ 加回到 $W_0$ 中。因此，部署带有 LoRA 的大模型，其**推理延迟与基座模型完全相同**（Zero Latency Cost）。
+
+\begin{rosetta}{LoRA 部署公式}
+    \begin{equation}
+        W_{deploy} = W_0 + B A
+    \end{equation}
+    在 PyTorch 中只需执行 \pyfunc{W0.add\_(B @ A)} 即可卸载独立参数。
+\end{rosetta}

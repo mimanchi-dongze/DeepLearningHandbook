@@ -1,0 +1,26 @@
+\chapter{对抗与对比学习}
+\label{ch:adversarial_contrastive}
+
+传统的预测任务旨在最小化误差，而对抗与对比学习则是让模型在数据分布与表征空间中互相博弈或聚类。
+
+\section{生成对抗网络 (GAN)}
+GAN 由生成器 (Generator) 和判别器 (Discriminator) 组成，两者进行极小极大博弈 (Min-Max Game)。
+
+\begin{rosetta}{GAN 目标函数}
+    \begin{equation}
+        \min_G \max_D V(D, G) = \mathbb{E}_{x \sim p_{data}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+    \end{equation}
+    判别器 $D$ 试图将原数据打高分 (1)，假数据打低分 (0)；生成器 $G$ 试图骗过 $D$（让 $D(G(z))$ 趋近于 1）。
+\end{rosetta}
+
+\section{对比学习与 InfoNCE 损失}
+多模态模型（如 CLIP）和自监督学习的核心，通过拉近正样本、推开负样本来学习高维特征。
+
+\begin{rosetta}{InfoNCE (Temperature Scaled Cross-Entropy)}
+    \begin{equation}
+        \mathcal{L}_q = -\log \frac{\exp(\mathbf{q} \cdot \mathbf{k}^+ / \tau)}{\sum_{i=0}^{K} \exp(\mathbf{q} \cdot \mathbf{k}_i / \tau)}
+    \end{equation}
+    其中 $\mathbf{q}$ 是查询向量，$\mathbf{k}^+$ 是匹配的正样本，$\tau$ 是温度超参数（控制对困难负样本的惩罚力度）。
+    \tcblower
+    \pyfunc{F.cross\_entropy(logits / temperature, labels)}
+\end{rosetta}

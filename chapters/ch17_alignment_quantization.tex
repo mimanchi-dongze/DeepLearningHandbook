@@ -1,0 +1,28 @@
+\chapter{对齐与极端量化}
+\label{ch:alignment_quantization}
+
+当大模型具备涌现能力后，下一步是让其输出符合人类偏好（对齐），并能在消费级硬件上运行（量化）。
+
+\section{直接偏好优化 (DPO)}
+彻底绕过了传统 RLHF 中复杂的强化学习 (PPO) 训练流程，直接在偏好数据上优化语言模型本身。
+
+\begin{rosetta}{DPO 目标函数}
+    设 $\pi_\theta$ 为正在训练的模型，$\pi_{ref}$ 为参考模型，$y_w$ 为人类偏好的回答，$y_l$ 为被拒绝的回答。
+    \begin{equation}
+        \mathcal{L}_{DPO} = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{ref}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{ref}(y_l|x)} \right) \right]
+    \end{equation}
+    其中 $\beta$ 是控制偏离参考模型程度的温度系数，$\sigma$ 为 Sigmoid 函数。该公式隐式定义了奖励。
+\end{rosetta}
+
+\section{QLoRA 与 NF4 量化}
+为了在单张显卡上微调大模型，QLoRA 引入了一种信息论上最优的新数据类型：4-bit NormalFloat (NF4)。
+
+\begin{rosetta}{分位数归一化与双重量化}
+    \textbf{NF4 的数学基础}:
+    假设神经网络的权重服从均值为 0 的正态分布 $\mathcal{N}(0, \sigma^2)$。NF4 预先计算了该分布的 16 个等概率分位数作为量化点.
+    \begin{equation}
+        q_i = \frac{1}{2} \left( Q\left(\frac{i}{16}\right) + Q\left(\frac{i+1}{16}\right) \right)
+    \end{equation}
+    \textbf{双重量化 (Double Quantization)}: 
+    为了存储量化所需的缩放常数 $c$，对这些常数进行二次 8-bit 量化，使得平均每参数的内存开销再降低 $0.37$ bits。
+\end{rosetta}

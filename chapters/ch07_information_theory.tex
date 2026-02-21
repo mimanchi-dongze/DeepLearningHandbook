@@ -1,0 +1,46 @@
+\chapter{信息论与概率损失}
+\label{ch:information}
+
+损失函数用于衡量模型预测分布与真实分布之间的差异。在分类生成任务中，基于信息论（Information Theory）的度量是最基础的法则。
+
+\section{香农熵与交叉熵 (Entropy \& Cross-Entropy)}
+
+香农熵（Entropy）衡量了一个分布的不确定性。当我们使用模型预测的分布 $Q$ 来逼近真实分布 $P$ 时，需要的额外信息量就是交叉熵。
+
+\begin{rosetta}{交叉熵损失}
+    \begin{align}
+        H(P, Q) &= -\sum_{x} P(x) \log Q(x) \\
+        &= H(P) + D_{KL}(P \| Q)
+    \end{align}
+    其中 $H(P)$ 是真实分布的固有熵。在独热编码（One-Hot）下，真实类别概率 $P(x_i)=1$，固有熵为 0，交叉熵退化为：
+    \begin{equation}
+        \mathcal{L}_{CE} = -\log(\hat{y}_c)
+    \end{equation}
+    这正是 \pyfunc{nn.NLLLoss(LogSoftmax(x))} 的底层逻辑。
+    \tcblower
+    \pyfunc{nn.CrossEntropyLoss()}
+\end{rosetta}
+
+\section{KL 散度 (Kullback-Leibler Divergence)}
+用于衡量两个概率分布（通常为预测与目标或先验）之间的“距离”（相对熵，不对称）。
+
+\begin{rosetta}{KL 散度}
+    \begin{equation}
+        D_{KL}(P \| Q) = \sum_{x} P(x) \log\left(\frac{P(x)}{Q(x)}\right)
+    \end{equation}
+    在 VAE 中，KL 散度常被用于正则化潜变量（Latent Variable）分布使其逼近标准正态分布 $\mathcal{N}(0, I)$。
+    \tcblower
+    \pyfunc{nn.KLDivLoss(reduction='batchmean')}
+\end{rosetta}
+
+\section{二元交叉熵 (BCE)}
+多标签分类或二分类的专用交叉熵。
+
+\begin{rosetta}{BCE Loss}
+    \begin{equation}
+        \mathcal{L}_{BCE} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i) \right]
+    \end{equation}
+    这是伯努利分布下最大似然估计的直接结果。
+    \tcblower
+    \pyfunc{nn.BCELoss()} / \pyfunc{BCEWithLogitsLoss()}
+\end{rosetta}
