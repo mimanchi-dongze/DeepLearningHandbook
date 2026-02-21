@@ -24,7 +24,7 @@ jobs:
         with:
           root_file: main.tex
           compiler: xelatex
-          args: -interaction=nonstopmode -shell-escape
+          args: -pdfxe -interaction=nonstopmode -shell-escape
           # Using latexmk internally via xu-cheng action
 
       - name: Upload PDF artifact

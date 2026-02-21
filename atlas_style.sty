@@ -58,15 +58,14 @@
 \renewcommand{\headrule}{\hbox to\headwidth{\color{gray}\leaders\hrule\hfill}}
 
 % --- 目录美化 ---
-\@ifundefined{cftchapfont}{}{
-  \renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\color{maintheme}}
-  \renewcommand{\cftaftertoctitle}{\hfill\mbox{}\\[2ex]}
-  \renewcommand{\cftchapfont}{\large\bfseries\color{maintheme}}
-  \renewcommand{\cftchappagefont}{\bfseries\color{maintheme}}
-  \setlength{\cftbeforechapskip}{1.5ex}
-  \renewcommand{\cftsecdotsep}{\cftnodots}
-  \renewcommand{\cftsecfont}{\normalfont}
-}
+\RequirePackage{tocloft}
+\renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\color{maintheme}}
+\renewcommand{\cftaftertoctitle}{\hfill\mbox{}\\[2ex]}
+\renewcommand{\cftchapfont}{\large\bfseries\color{maintheme}}
+\renewcommand{\cftchappagefont}{\bfseries\color{maintheme}}
+\setlength{\cftbeforechapskip}{1.5ex}
+\renewcommand{\cftsecdotsep}{\cftnodots}
+\renewcommand{\cftsecfont}{\normalfont}
 
 % --- 章节标题美化 ---
 \titleformat{\chapter}[display]
